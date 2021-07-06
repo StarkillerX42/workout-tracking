@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+__author__ = "Dylan Gatlin"
+
+import matplotlib.pyplot as plt
+import seaborn as sb
+
+from pathlib import Path
+from argparse import ArgumentParser
+from astropy.io import ascii
+from astropy.time import Time
+
+project = Path(__file__).parent.parent
+sb.set_theme(style="darkgrid")
+
+
+def parse_args():
+    parser = ArgumentParser("A plotting tool for rowing workouts, logged with"
+                            " log-rowing")
+    parser.add_argument("name", help="User name, case insensitive, must match"
+                                     " an existing profile")
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="Verbose debugging")
+    return parser.parse_args()
+
+
+def main(args=parse_args()):
+    data_file = project / f"data/{args.name.lower()}_rowing.csv"
+    if not data_file.exists():
+        raise FileExistsError(f"Username {args.name.title()} not found")
+    data = ascii.read(data_file.as_posix())
+    data["Score"] = (data["Reps"] / data["Duration"]
+                     * data["Resistance"] / data["Difficulty"])
+    data["Score"] = data["Score"] / data["Score"].max()
+    if args.verbose:
+        print(data)
+
+    fig = plt.figure(figsize=(6, 4), dpi=100)
+    ax = fig.gca()
+    ax.plot_date(Time(data["Time"]).plot_date, data["Score"])
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Normalized Rating")
+    ax.set_title(f"{args.name.title()}'s Rowing Performance")
+    ax.xaxis.set_tick_params(rotation=30)
+    fig.savefig(project / f"data/{args.name.lower()}_rowing_plot.png")
+    return 0
+
+
+if __name__ == "__main__":
+    main()

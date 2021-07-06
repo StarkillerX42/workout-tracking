@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+__author__ = "Dylan Gatlin"
+
+from argparse import ArgumentParser
+from pathlib import Path
+from astropy.time import Time
+
+here = Path(__file__).parent
+
+
+def parse_args():
+    parser = ArgumentParser("A tool for collecting workout habits")
+    parser.add_argument("name",
+                        help="Single word name, case insensitive")
+    parser.add_argument("time", help="Time spent rowing, assuming mm:ss format")
+    parser.add_argument("reps", help="Total number of reps")
+    parser.add_argument("resistance", help="Resistance setting")
+    parser.add_argument("difficulty", help="Difficulty rating (0-10)")
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="Debug printing")
+
+    return parser.parse_args()
+
+
+def main(args=parse_args()):
+    data_dir = here.parent / "data/"
+    if not data_dir.exists():
+        data_dir.mkdir()
+
+    data_file = data_dir / f"{args.name.lower()}_rowing.csv"
+    if not data_file.exists():
+        print(f"Creating profile for {args.name.title()}")
+        with data_file.open('w') as fil:
+            fil.write("# Name, Time, Duration, Reps, Resistance, Difficulty\n")
+        data_file.touch()
+    if args.verbose:
+        print(f"Writing to {data_file.absolute()}")
+    if len(args.duration) != 5:
+        raise ValueError("Workout duration is not of format mm:ss")
+    duration = int(args.time[:2]) * 60 + int(args.time[3:])
+    with data_file.open('a') as fil:
+        fil.write(f"{args.name.title()}, {Time.now().isot}, {duration},"
+                  f" {args.reps}, {args.resistance}, {args.difficulty}\n")
+    return 0
+
+
+if __name__ == "__main__":
+    main()
