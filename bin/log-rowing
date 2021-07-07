@@ -36,7 +36,7 @@ def main(args=parse_args()):
         data_file.touch()
     if args.verbose:
         print(f"Writing to {data_file.absolute()}")
-    if len(args.duration) != 5:
+    if len(args.time) != 5:
         raise ValueError("Workout duration is not of format mm:ss")
     duration = int(args.time[:2]) * 60 + int(args.time[3:])
     with data_file.open('a') as fil:
