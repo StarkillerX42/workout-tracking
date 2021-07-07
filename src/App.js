@@ -10,13 +10,9 @@ export class TextBox extends Component {
     }
     displayName = TextBox.name
     render() {
-        return (
-                <form>
-                    <label>{this.name}:
-                    <input type="text" name={this.name}/>
-                    </label>
-                    <input type="submit" value="Submit"/>
-                </form>
+        return (<div><label>{this.name}: </label>
+                <input type="text" name={this.name}/>
+        </div>
         )
     }
 }
@@ -26,6 +22,7 @@ function render_boxes() {
     let boxes = []
     for(let name in box_names) {
         const box = new TextBox(name)
+        console.log(typeof box)
         boxes.push(box)
     }
     let x = null
@@ -35,15 +32,30 @@ function render_boxes() {
     }
     return(x)
 }
+
+function TextBoxes () {
+    return (
+        <form>
+            <label for="name">Name: </label><br/>
+            <input type="text" id={"dur"}/><br/>
+            <label for="dur">Duration: </label><br/>
+            <input type="text" id="dur"/><br/>
+            <label for="reps">Reps: </label><br/>
+            <input type="text" id="reps"/><br/>
+            <label for="res">Resistance: </label><br/>
+            <input type={"text"} id={"res"}/><br/>
+            <label for={"dif"}>Difficulty: </label><br/>
+            <input type={"text"} id={"dif"}/><br/>
+            <input type={"submit"} value={"Submit"}/>
+        </form>
+    )
+}
+
 function App() {
-    const box = new TextBox("Time")
+  let boxes = TextBoxes()
   return (
-    <div className="Workout Logging">
-        {box.render()}
-        <script src={render_boxes}/>
-      <button>
-        Submit
-      </button>
+    <div className="rowLogging" id="rowLogging">
+        {boxes}
     </div>
   );
 }
